@@ -80,12 +80,14 @@ func HasEC2ResourceTags() bool {
 		return false
 	}
 	return queryCacheBool(hasEC2ResourceTagsCacheKey, func() (bool, time.Duration) {
-		client, err := ecsmeta.V3FromCurrentTask()
+		_, err := ecsmeta.V3FromCurrentTask()
 		if err != nil {
 			return newBoolEntry(false)
 		}
-		_, err = client.GetTaskWithTags()
-		return newBoolEntry(err == nil)
+		// TODO(pavel): run GetTaskWithTags() with retries and backoff.
+		//_, err = client.GetTaskWithTags()
+		//return newBoolEntry(err == nil)
+		return newBoolEntry(true)
 	})
 }
 

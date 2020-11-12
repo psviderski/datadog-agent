@@ -26,7 +26,7 @@ const (
 	taskMetadataPath = "/tasks"
 
 	// Default client configuration
-	endpointTimeout = 500 * time.Millisecond
+	endpointTimeout = 5 * time.Second
 )
 
 // Client represents a client for a metadata v1 API endpoint.
