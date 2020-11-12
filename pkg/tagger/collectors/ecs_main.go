@@ -74,11 +74,13 @@ func (c *ECSCollector) Detect(out chan<- []*TagInfo) (CollectionMode, error) {
 // Fetch fetches ECS tags
 func (c *ECSCollector) Fetch(entity string) ([]string, []string, []string, error) {
 	entityType, cID := containers.SplitEntityName(entity)
+	log.Debugf("Fetch entity: %s, entityType: %s, cID: %s", entity, entityType, cID)
 	if entityType != containers.ContainerEntityName || len(cID) == 0 {
 		return nil, nil, nil, nil
 	}
 
 	tasks, err := c.metaV1.GetTasks()
+	log.Debugf("Get v1 tasks for entity: %s: %+v, error: %v", entity, tasks, err)
 	if err != nil {
 		return []string{}, []string{}, []string{}, err
 	}
@@ -113,14 +115,18 @@ func (c *ECSCollector) Fetch(entity string) ([]string, []string, []string, error
 	return []string{}, []string{}, []string{}, errors.NewNotFound(entity)
 }
 
-func addTagsForContainer(containerID string, tags *utils.TagList) {
+func addTagsForContainer(containerID string, tags *utils.TagList) error {
+	if len(containerID) == 0 {
+		log.Warnf("Fetching task with tags v3 for an empty container id: %s", containerID)
+	}
 	task, err := fetchContainerTaskWithTagsV3(containerID)
 	if err != nil {
 		log.Warnf("Unable to get resource tags for container %s: %s", containerID, err)
-		return
+		return err
 	}
 	addResourceTags(tags, task.ContainerInstanceTags)
 	addResourceTags(tags, task.TaskTags)
+	return nil
 }
 
 func fetchContainerTaskWithTagsV3(containerID string) (*v3.Task, error) {

@@ -22,7 +22,6 @@ const (
 	isFargateInstanceCacheKey      = "IsFargateInstanceCacheKey"
 	hasFargateResourceTagsCacheKey = "HasFargateResourceTagsCacheKey"
 	hasEC2ResourceTagsCacheKey     = "HasEC2ResourceTagsCacheKey"
-	hasEC2ResourceTagsCacheExpiry  = 5 * time.Minute
 )
 
 // IsECSInstance returns whether the agent is running in ECS.
@@ -90,7 +89,9 @@ func HasEC2ResourceTags() bool {
 		if err != nil {
 			log.Debugf("failed to get task with tags: %s", err)
 		}
-		return err == nil, hasEC2ResourceTagsCacheExpiry
+		// TODO(pavel): run GetTaskWithTags() with retries and backoff.
+		//return err == nil, hasEC2ResourceTagsCacheExpiry
+		return newBoolEntry(true)
 	})
 }
 
