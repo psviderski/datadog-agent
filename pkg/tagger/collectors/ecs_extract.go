@@ -14,6 +14,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/tagger/utils"
 	"github.com/DataDog/datadog-agent/pkg/util/containers"
 	v1 "github.com/DataDog/datadog-agent/pkg/util/ecs/metadata/v1"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 )
 
 func (c *ECSCollector) parseTasks(tasks []v1.Task, targetDockerID string, containerHandlers ...func(containerID string, tags *utils.TagList) error) ([]*TagInfo, error) {
@@ -25,6 +26,12 @@ func (c *ECSCollector) parseTasks(tasks []v1.Task, targetDockerID string, contai
 			continue
 		}
 		for _, container := range task.Containers {
+			// ECS agent /v1/tasks endpoint sometimes return an empty DockerID for a new container. Skip it.
+			if container.DockerID == "" {
+				log.Warnf("Skipping the container with an empty DockerID. Task ARN: %s, DockerName: %s",
+					task.name, container.DockerName)
+				continue
+			}
 			// Only collect new containers + the targeted container, to avoid empty tags on race conditions
 			if c.expire.Update(container.DockerID, now) || container.DockerID == targetDockerID {
 				tags := utils.NewTagList()
