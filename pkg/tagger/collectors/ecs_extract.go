@@ -29,7 +29,7 @@ func (c *ECSCollector) parseTasks(tasks []v1.Task, targetDockerID string, contai
 			// ECS agent /v1/tasks endpoint sometimes return an empty DockerID for a new container. Skip it.
 			if container.DockerID == "" {
 				log.Warnf("Skipping the container with an empty DockerID. Task ARN: %s, DockerName: %s",
-					task.name, container.DockerName)
+					task.Arn, container.DockerName)
 				continue
 			}
 			// Only collect new containers + the targeted container, to avoid empty tags on race conditions
