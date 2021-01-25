@@ -22,6 +22,7 @@ const (
 	isFargateInstanceCacheKey      = "IsFargateInstanceCacheKey"
 	hasFargateResourceTagsCacheKey = "HasFargateResourceTagsCacheKey"
 	hasEC2ResourceTagsCacheKey     = "HasEC2ResourceTagsCacheKey"
+	hasEC2ResourceTagsCacheExpiry  = 5 * time.Minute
 )
 
 // IsECSInstance returns whether the agent is running in ECS.
