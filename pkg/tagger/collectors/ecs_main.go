@@ -74,13 +74,11 @@ func (c *ECSCollector) Detect(out chan<- []*TagInfo) (CollectionMode, error) {
 // Fetch fetches ECS tags
 func (c *ECSCollector) Fetch(entity string) ([]string, []string, []string, error) {
 	entityType, cID := containers.SplitEntityName(entity)
-	log.Debugf("Fetch entity: %s, entityType: %s, cID: %s", entity, entityType, cID)
 	if entityType != containers.ContainerEntityName || len(cID) == 0 {
 		return nil, nil, nil, nil
 	}
 
 	tasks, err := c.metaV1.GetTasks()
-	log.Debugf("Get v1 tasks for entity: %s: %+v, error: %v", entity, tasks, err)
 	if err != nil {
 		return []string{}, []string{}, []string{}, err
 	}
